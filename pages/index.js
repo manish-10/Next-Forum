@@ -1,11 +1,12 @@
 import { useAuthDispatch, useAuthState } from "../src/context/auth";
-
+import Link from 'next/link'
 export default function Home() {
   const { isAuthenticated, user } = useAuthState();
   const { login, register, logout } = useAuthDispatch();
   return (
     isAuthenticated ? <><p>{`Hello ${user.name}`}</p><button onClick={() => logout()}>Logout</button></> :
-      <><button onClick={() => login({ email: "test@test.com", password: "abc123" })}>Login</button>
-        <button onClick={() => register({ name: "testuser", email: "test@test.com", password: "abc123" })}>Register</button></>
+      <><Link href="/auth/register">Register</Link> 
+        <Link href="/auth/login">Login</Link>
+      </>
   )
 }
