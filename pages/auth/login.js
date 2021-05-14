@@ -6,7 +6,8 @@ import {useAuthDispatch ,useAuthState} from '../../src/context/auth'
 import { useForm } from 'react-hook-form'
 import {useRouter} from 'next/router'
 import { useEffect } from 'react'
-export default function RegisterPage() {
+import Layout from '../../src/components/Layout'
+export default function Login() {
     const { handleSubmit, register,setError,formState: { isSubmitting, errors } } = useForm()
     const {login} = useAuthDispatch()
     const {isAuthenticated} = useAuthState()
@@ -58,3 +59,5 @@ export default function RegisterPage() {
         </>
     )
 }
+
+Login.Layout = Layout;

@@ -2,9 +2,12 @@ import 'tailwindcss/tailwind.css'
 import { AuthProvider } from '../src/context/auth'
 
 function MyApp({ Component, pageProps }) {
+  const Layout = Component.Layout || (({children})=> <> {children} </>)
   return (
     <AuthProvider>
-      <Component {...pageProps} />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </AuthProvider>
   )
 }
