@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import {useRouter} from "next/router"
 import Layout from "../src/components/Layout";
 import { hasuraAdminClient, gql } from "../src/lib/hasura-admin-client";
 import { hasuraUserClient } from "../src/lib/hasura-user-client";
@@ -10,17 +11,23 @@ const GetCategories = gql`{
     }
   }`
 const InsertThread = gql`mutation InsertThread($categoryId: uuid!, $title: String!, $message: String!) {
-    insert_threads_one(object: {
-      category_id: $categoryId, 
-      title: $title, 
-      posts: 
-      {data: 
-        {message: $message}}}) {
+    insert_threads_one(object: {category_id: $categoryId, title: $title, posts: {data: {message: $message}}}) {
       id
+      author {
+        name
+      }
+      title
+      catagory {
+        name
+      }
+      posts {
+        message
+      }
     }
-  }`
+  }
+  `
 export default function AskPage({ categories }) {
-
+    const router = useRouter()
     const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm()
 
 
@@ -31,6 +38,8 @@ export default function AskPage({ categories }) {
 
             const { insert_threads_one } = await hasuraClient.request(InsertThread, { categoryId, title, message })
             console.log(insert_threads_one)
+
+             router.push(`/threads/${insert_threads_one.id}`)
         }
         catch (err) { console.log(err) }
     }
