@@ -8,7 +8,7 @@ export default function Layout ({children}){
     <>
         <header className="bg-white py-6 shadow-sm">
         <div className="max-w-4xl mx-auto px-6">
-        {isAuthenticated ? <><p>{`Hello ${user.name}`}</p><button onClick={() => logout()}>Logout</button></> :
+        {isAuthenticated ? <><p>{`Hello ${user.name}`}</p><button onClick={() => logout()}>Logout</button><Link href='/ask'>Ask a question</Link></> :
       <><Link href="/auth/register">Register</Link> 
         <Link href="/auth/login">Login</Link>
       </>}

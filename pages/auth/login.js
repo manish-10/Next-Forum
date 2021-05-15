@@ -2,11 +2,11 @@
 //2. Send POST request to /api/auth/Register
 //3.If there is an error ,return error
 //4. If successful, return to root 
-import {useAuthDispatch ,useAuthState} from '../../src/context/auth'
 import { useForm } from 'react-hook-form'
 import {useRouter} from 'next/router'
 import { useEffect } from 'react'
 import Layout from '../../src/components/Layout'
+import { useAuthDispatch, useAuthState } from '../../src/context/auth'
 export default function Login() {
     const { handleSubmit, register,setError,formState: { isSubmitting, errors } } = useForm()
     const {login} = useAuthDispatch()
