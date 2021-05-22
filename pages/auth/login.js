@@ -12,7 +12,7 @@ export default function Login() {
     const {login} = useAuthDispatch()
     const {isAuthenticated} = useAuthState()
     const router = useRouter()
-
+    const emailRegexPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}$/i
     useEffect(()=>{
         if(isAuthenticated)
         router.push('/')
@@ -40,7 +40,7 @@ export default function Login() {
             <form onSubmit={handleSubmit(onSubmit)}>
 
                 <div>
-                    <input type="email" id="email" {...register("email", { required: "Please enter your email", pattern:{message:"Please enter a valid email", } })} placeholder="Email" />
+                    <input type="text" id="email" {...register("email", { required: "Please enter your email", pattern:{value:emailRegexPattern, message:"Please enter a valid email", } })} placeholder="Email" />
                     {errors.email && <span>{errors.email.message}</span>}
                 </div>
 
