@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { useRouter } from "next/router";
 import PostList from "../../src/components/PostList";
 import PostForm from "../../src/components/PostForm";
+import { useAuthState } from "../../src/context/auth";
 const GetThreadsId = gql`
   query GetThreadsId {
     threads {
@@ -47,7 +48,8 @@ const AddPostReply = gql`
 const ThreadPage = ({ initialData }) => {
   const router = useRouter();
   const hasuraClient = hasuraUserClient();
-  const { id } = router.query;
+  const { id, isFallback } = router.query;
+  const { isAuthenticated } = useAuthState();
   const { data, mutate } = useSWR(
     [GetThreadsById, id],
     (query, id) => hasuraClient.request(query, { id }),
@@ -57,7 +59,10 @@ const ThreadPage = ({ initialData }) => {
       revalidateOnMount: true,
     }
   );
-  const handleSubmit = async ({ message }) => {
+
+  if (!isFallback && !data) return <p>No such thread found</p>;
+
+  const handleSubmit = async ({ message }, { target }) => {
     try {
       console.log(id);
       const hasuraClient = hasuraUserClient();
@@ -65,6 +70,7 @@ const ThreadPage = ({ initialData }) => {
         threadId: id,
         message,
       });
+      target.reset();
       mutate({
         ...data,
         threads_by_pk: {
@@ -76,12 +82,15 @@ const ThreadPage = ({ initialData }) => {
       console.log(err);
     }
   };
+  if (isFallback) return <Layout>Loading thread</Layout>;
   return (
     <div>
       <h1>{data.threads_by_pk.title}</h1>
       <div className="p-6 space-y-10">
         <PostList posts={data.threads_by_pk.posts} />
-        {!data.threads_by_pk.locked && <PostForm onSubmit={handleSubmit} />}
+        {!data.threads_by_pk.locked && isAuthenticated && (
+          <PostForm onSubmit={handleSubmit} />
+        )}
       </div>
     </div>
   );

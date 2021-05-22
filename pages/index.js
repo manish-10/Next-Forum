@@ -6,9 +6,12 @@ import ThreadList from "../src/components/ThreadList";
 
 const GetThreads = gql`
   query GetThreads {
-    threads(order_by: { posts_aggregate: { max: { created_at: desc } } }) {
+    threads(
+      order_by: { pinned: desc, posts_aggregate: { max: { created_at: desc } } }
+    ) {
       id
       locked
+      pinned
       answered
       title
       author {
@@ -47,7 +50,7 @@ const IndexPage = ({ initialData }) => {
     }
   );
   return (
-    <div  >
+    <div>
       <p className="text-red-500">Welcome to Forum!</p>
       <ThreadList threads={data.threads} />
     </div>

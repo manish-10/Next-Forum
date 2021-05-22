@@ -26,7 +26,7 @@ export default function Post({ post }) {
             <h3 className="text-xl font-semibold">{post.author.name}</h3>
           </a>
         </Link>
-        <p className="text-sm">{post.message}</p>
+        <p className="text-sm text-gray-600">{post.message}</p>
         <div className="inline-flex space-x-3">
           <span className="align-middle text-sm">{timeago}</span>
         </div>
