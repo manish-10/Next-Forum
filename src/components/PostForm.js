@@ -1,11 +1,13 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
+import ReactMde from "react-mde";
 export default function PostForm({ onSubmit }) {
   const {
-    register,
     handleSubmit,
+    control,
     formState: { isSubmitting, errors },
   } = useForm();
-
+  const [selectedTab, setSelectedTab] = useState("write");
   return (
     <div className="flex space-x-3">
       <div>
@@ -21,11 +23,21 @@ export default function PostForm({ onSubmit }) {
       </div>
       <div className="flex-1">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <textarea
-            className="w-full bg-gray-100 p-3 rounded onfocus:outline-none"
-            rows={5}
-            {...register("message", { required: "Leaving an empty reply?" })}
-            placeholder={"Reply to thread"}
+          <Controller
+            name="message"
+            control={control}
+            defaultValue={""}
+            rules={{ required: "Leaving an empty reply?" }}
+            render={({ field }) => (
+              <ReactMde
+                {...field}
+                selectedTab={selectedTab}
+                onTabChange={setSelectedTab}
+                generateMarkdownPreview={(markdown) =>
+                  Promise.resolve(<ReactMarkdown children={markdown} />)
+                }
+              />
+            )}
           />
           <div>{errors.message && <span>{errors.message.message}</span>}</div>
 

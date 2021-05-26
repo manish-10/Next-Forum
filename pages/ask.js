@@ -1,8 +1,11 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../src/components/Layout";
 import { hasuraAdminClient, gql } from "../src/lib/hasura-admin-client";
 import { hasuraUserClient } from "../src/lib/hasura-user-client";
+import ReactMde from "react-mde";
+import ReactMarkdown from "react-markdown";
 const GetCategories = gql`
   {
     categories {
@@ -39,21 +42,26 @@ const InsertThread = gql`
   }
 `;
 export default function AskPage({ categories }) {
+  const [selectedTab, setSelectedTab] = useState("write");
   const router = useRouter();
   const {
     register,
     handleSubmit,
+    control,
     formState: { isSubmitting, errors },
   } = useForm();
 
   const onSubmit = async ({ categoryId, title, message }) => {
-     const hasuraClient = hasuraUserClient();
+    const hasuraClient = hasuraUserClient();
     try {
-      const { insert_threads_one } = await hasuraClient.request(InsertThread, { categoryId, title, message })
-      console.log(insert_threads_one)
+      const { insert_threads_one } = await hasuraClient.request(InsertThread, {
+        categoryId,
+        title,
+        message,
+      });
+      console.log(insert_threads_one);
 
-       router.push(`/threads/${insert_threads_one.id}`)
-     
+      router.push(`/thread/${insert_threads_one.id}`);
     } catch (err) {
       console.log(err);
     }
@@ -87,13 +95,31 @@ export default function AskPage({ categories }) {
           {errors.title && <span>{errors.title.message}</span>}
         </div>
         <div>
-          <textarea
-            {...register("message", { required: "Leaving an empty post?" })}
-            placeholder={"Enter a message"}
+          <Controller
+            name="message"
+            control={control}
+            defaultValue={""}
+            rules={{ required: "Leaving an empty post?" }}
+            render={({ field }) => (
+              <ReactMde
+                {...field}
+                selectedTab={selectedTab}
+                onTabChange={setSelectedTab}
+                generateMarkdownPreview={(markdown) =>
+                  Promise.resolve(<ReactMarkdown children={markdown} />)
+                }
+              />
+            )}
           />
           {errors.message && <span>{errors.message.message}</span>}
         </div>
-        <input type="submit" disabled={isSubmitting} value={"Make a post"} />
+        <button
+          className="rounded bg-purple-500 p-2 font-semibold text-white hover:bg-purple-600 onfocus:outline-none"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          Make a post
+        </button>
       </form>
     </>
   );

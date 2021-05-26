@@ -1,5 +1,6 @@
 import { formatRelative } from "date-fns";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 export default function Post({ post }) {
   const today = new Date();
   const timeago = formatRelative(Date.parse(post.created_at), today, {
@@ -26,7 +27,9 @@ export default function Post({ post }) {
             <h3 className="text-xl font-semibold">{post.author.name}</h3>
           </a>
         </Link>
-        <p className="text-sm text-gray-600">{post.message}</p>
+        <p className="text-sm text-gray-600">
+          <ReactMarkdown children={post.message} />
+        </p>
         <div className="inline-flex space-x-3">
           <span className="align-middle text-sm">{timeago}</span>
         </div>
