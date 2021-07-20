@@ -48,7 +48,17 @@ const AddPostReply = gql`
       message
       created_at
       author {
+        id
         name
+      }
+      like {
+        id
+        user_id
+      }
+      like_aggregate {
+        aggregate {
+          count
+        }
       }
     }
   }
@@ -64,6 +74,13 @@ const InsertLikes = gql`
 const DeleteLikes = gql`
   mutation DeleteLikes($id: uuid!) {
     delete_likes_by_pk(id: $id) {
+      id
+    }
+  }
+`;
+const DeletePost = gql`
+  mutation DeletePost($id: uuid!) {
+    delete_posts_by_pk(id: $id) {
       id
     }
   }
@@ -118,6 +135,20 @@ const ThreadPage = ({ initialData }) => {
     await hasuraClient.request(DeleteLikes, { id });
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await hasuraClient.request(DeletePost, { id });
+      mutate({
+        ...data,
+        threads_by_pk: {
+          ...data.threads_by_pk,
+          posts: data.threads_by_pk.posts.filter((p) => p.id != id),
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   if (isFallback) return <Layout>Loading thread</Layout>;
   return (
     <div>
@@ -125,7 +156,7 @@ const ThreadPage = ({ initialData }) => {
       <div className="p-6 space-y-10">
         <PostList
           posts={data.threads_by_pk.posts}
-          actions={{ handleLikes, handleUnLikes }}
+          actions={{ handleLikes, handleUnLikes, handleDelete }}
         />
         {!data.threads_by_pk.locked && isAuthenticated && (
           <PostForm onSubmit={handlePostSubmit} />
