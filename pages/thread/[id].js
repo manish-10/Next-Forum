@@ -27,6 +27,15 @@ const GetThreadsById = gql`
           id
           name
         }
+        like {
+          id
+          user_id
+        }
+        like_aggregate {
+          aggregate {
+            count
+          }
+        }
       }
     }
   }
@@ -41,6 +50,21 @@ const AddPostReply = gql`
       author {
         name
       }
+    }
+  }
+`;
+
+const InsertLikes = gql`
+  mutation InsertLikes($postId: uuid!) {
+    insert_likes_one(object: { post_id: $postId }) {
+      id
+    }
+  }
+`;
+const DeleteLikes = gql`
+  mutation DeleteLikes($id: uuid!) {
+    delete_likes_by_pk(id: $id) {
+      id
     }
   }
 `;
@@ -62,10 +86,10 @@ const ThreadPage = ({ initialData }) => {
 
   if (!isFallback && !data) return <p>No such thread found</p>;
 
-  const handleSubmit = async ({ message }, { target }) => {
+  const handlePostSubmit = async ({ message }, { target }) => {
     try {
       console.log(id);
-      const hasuraClient = hasuraUserClient();
+
       const { insert_posts_one } = await hasuraClient.request(AddPostReply, {
         threadId: id,
         message,
@@ -82,14 +106,29 @@ const ThreadPage = ({ initialData }) => {
       console.log(err);
     }
   };
+
+  const handleLikes = async (postId) => {
+    await hasuraClient.request(InsertLikes, {
+      postId,
+    });
+    console.log("hi");
+  };
+
+  const handleUnLikes = async (id) => {
+    await hasuraClient.request(DeleteLikes, { id });
+  };
+
   if (isFallback) return <Layout>Loading thread</Layout>;
   return (
     <div>
       <h1>{data.threads_by_pk.title}</h1>
       <div className="p-6 space-y-10">
-        <PostList posts={data.threads_by_pk.posts} />
+        <PostList
+          posts={data.threads_by_pk.posts}
+          actions={{ handleLikes, handleUnLikes }}
+        />
         {!data.threads_by_pk.locked && isAuthenticated && (
-          <PostForm onSubmit={handleSubmit} />
+          <PostForm onSubmit={handlePostSubmit} />
         )}
       </div>
     </div>

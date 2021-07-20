@@ -2,16 +2,16 @@ import { formatRelative } from "date-fns";
 import Link from "next/link";
 import React from "react";
 
+const today = new Date();
+
 const Thread = ({ thread }) => {
-  const today = new Date();
+  if (!thread) return null;
   const { count } = thread.posts_aggregate.aggregate;
   const hasreplies = count > 1;
   const [lastpost] = thread.posts;
-
   const timeago = formatRelative(Date.parse(lastpost.created_at), today, {
     weekStartOn: 1,
   });
-  if (!thread) return null;
 
   return (
     <div className="p-6 flex space-x-3 ">

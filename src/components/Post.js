@@ -1,7 +1,9 @@
 import { formatRelative } from "date-fns";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-export default function Post({ post }) {
+import Reactions from "./Reactions";
+
+export default function Post({ post, actions }) {
   const today = new Date();
   const timeago = formatRelative(Date.parse(post.created_at), today, {
     weekStartOn: 1,
@@ -27,11 +29,19 @@ export default function Post({ post }) {
             <h3 className="text-xl font-semibold">{post.author.name}</h3>
           </a>
         </Link>
-        <p className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600">
           <ReactMarkdown children={post.message} />
-        </p>
+        </div>
         <div className="inline-flex space-x-3">
           <span className="align-middle text-sm">{timeago}</span>
+        </div>
+        <div>
+          <Reactions
+            {...actions}
+            likes={post.like}
+            likes_agg={post.like_aggregate.aggregate.count}
+            postId={post.id}
+          />
         </div>
       </div>
     </div>
