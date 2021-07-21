@@ -9,6 +9,7 @@ export default function Post({
   id,
   message,
   created_at,
+  updated_at,
   author,
   like,
   like_aggregate,
@@ -19,9 +20,14 @@ export default function Post({
   const { handleLikes, handleUnLikes, handleDelete, handleUpdate } = actions;
   const { isAuthenticated, user } = useAuthState();
   const isAuthor = isAuthenticated && user.id === author.id;
-  const timeago = formatRelative(Date.parse(created_at), today, {
+
+  const createdAt = formatRelative(Date.parse(created_at), today, {
     weekStartOn: 1,
   });
+  const updatedAt = formatRelative(Date.parse(updated_at), today, {
+    weekStartOn: 1,
+  });
+  const updated = createdAt != updatedAt;
   const [editing, setEditing] = useState(false);
   const toggleEditing = useCallback(() => {
     setEditing((v) => !v);
@@ -106,8 +112,13 @@ export default function Post({
             <ReactMarkdown children={message} className="prose" />
           )}
         </div>
-        <div className="inline-flex space-x-3">
-          <span className="align-middle text-sm">{timeago}</span>
+        <div className="inline-flex space-x-1">
+          <span className="align-middle text-sm">posted {createdAt}</span>
+          {updated && (
+            <span className="align-middle text-sm">
+              &middot; editted {updatedAt}
+            </span>
+          )}
         </div>
         <div>
           <Reactions

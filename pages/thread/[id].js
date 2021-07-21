@@ -27,6 +27,7 @@ const GetThreadsById = gql`
         id
         message
         created_at
+        updated_at
         author {
           id
           name
@@ -51,6 +52,7 @@ const AddPostReply = gql`
       id
       message
       created_at
+      updated_at
       author {
         id
         name
@@ -141,6 +143,7 @@ const ThreadPage = ({ initialData }) => {
       const { update_posts_by_pk } = await hasuraClient.request(UpdatePost, {
         id,
         message,
+        updated_at,
       });
 
       mutate({
