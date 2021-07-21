@@ -19,6 +19,10 @@ const GetThreadsById = gql`
       id
       title
       locked
+      category {
+        id
+        name
+      }
       posts(order_by: { created_at: asc }) {
         id
         message
@@ -85,6 +89,14 @@ const DeletePost = gql`
     }
   }
 `;
+const UpdatePost = gql`
+  mutation UpdatePost($id: uuid!, $message: String!) {
+    update_posts_by_pk(pk_columns: { id: $id }, _set: { message: $message }) {
+      id
+      message
+    }
+  }
+`;
 
 const ThreadPage = ({ initialData }) => {
   const router = useRouter();
@@ -124,6 +136,31 @@ const ThreadPage = ({ initialData }) => {
     }
   };
 
+  const handleUpdate = async ({ id, message }, { target }) => {
+    try {
+      const { update_posts_by_pk } = await hasuraClient.request(UpdatePost, {
+        id,
+        message,
+      });
+
+      mutate({
+        ...data,
+        threads_by_pk: {
+          ...data.threads_by_pk,
+          posts: data.threads_by_pk.posts.reduce((posts, post) => {
+            if (post.id === id)
+              return [...posts, { ...post, ...update_posts_by_pk }];
+
+            return [...posts, post];
+          }, []),
+        },
+      });
+      target.reset();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleLikes = async (postId) => {
     await hasuraClient.request(InsertLikes, {
       postId,
@@ -156,10 +193,25 @@ const ThreadPage = ({ initialData }) => {
       <div className="p-6 space-y-10">
         <PostList
           posts={data.threads_by_pk.posts}
-          actions={{ handleLikes, handleUnLikes, handleDelete }}
+          actions={{ handleLikes, handleUnLikes, handleDelete, handleUpdate }}
         />
         {!data.threads_by_pk.locked && isAuthenticated && (
-          <PostForm onSubmit={handlePostSubmit} />
+          <div className="flex space-x-3">
+            <div>
+              <span className="inline-block h-8 w-8 rounded-full overflow-hidden bg-gray-200">
+                <svg
+                  className="h-full w-full text-gray-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </span>
+            </div>
+            <div className="flex-1">
+              <PostForm onSubmit={handlePostSubmit} />
+            </div>
+          </div>
         )}
       </div>
     </div>

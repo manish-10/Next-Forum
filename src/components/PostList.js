@@ -4,7 +4,7 @@ export default function PostList({ posts, actions }) {
   return (
     <div className="divide-y">
       {posts.map((post, key) => (
-        <Post post={post} actions={actions} key={key} />
+        <Post {...post} actions={{ ...actions }} key={key} />
       ))}
     </div>
   );
