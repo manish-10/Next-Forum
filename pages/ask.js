@@ -59,7 +59,6 @@ export default function AskPage({ categories }) {
         title,
         message,
       });
-      console.log(insert_threads_one);
 
       router.push(`/thread/${insert_threads_one.id}`);
     } catch (err) {

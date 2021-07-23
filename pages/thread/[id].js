@@ -96,10 +96,18 @@ const UpdatePost = gql`
     update_posts_by_pk(pk_columns: { id: $id }, _set: { message: $message }) {
       id
       message
+      updated_at
     }
   }
 `;
-
+const UpdateLockedThreadStatus = gql`
+  mutation UpdatePost($id: uuid!, $locked: Boolean) {
+    update_threads_by_pk(pk_columns: { id: $id }, _set: { locked: $locked }) {
+      id
+      locked
+    }
+  }
+`;
 const ThreadPage = ({ initialData }) => {
   const router = useRouter();
   const hasuraClient = hasuraUserClient();
@@ -119,8 +127,6 @@ const ThreadPage = ({ initialData }) => {
 
   const handlePostSubmit = async ({ message }, { target }) => {
     try {
-      console.log(id);
-
       const { insert_posts_one } = await hasuraClient.request(AddPostReply, {
         threadId: id,
         message,
@@ -143,7 +149,6 @@ const ThreadPage = ({ initialData }) => {
       const { update_posts_by_pk } = await hasuraClient.request(UpdatePost, {
         id,
         message,
-        updated_at,
       });
 
       mutate({
@@ -158,7 +163,6 @@ const ThreadPage = ({ initialData }) => {
           }, []),
         },
       });
-      target.reset();
     } catch (err) {
       console.log(err);
     }
@@ -168,11 +172,14 @@ const ThreadPage = ({ initialData }) => {
     await hasuraClient.request(InsertLikes, {
       postId,
     });
-    console.log("hi");
   };
 
   const handleUnLikes = async (id) => {
-    await hasuraClient.request(DeleteLikes, { id });
+    try {
+      await hasuraClient.request(DeleteLikes, { id });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -189,10 +196,59 @@ const ThreadPage = ({ initialData }) => {
       console.log(err);
     }
   };
+
+  const handleLocked = async () => {
+    try {
+      const { update_threads_by_pk } = await hasuraClient.request(
+        UpdateLockedThreadStatus,
+        {
+          id,
+          locked: !data.threads_by_pk.locked,
+        }
+      );
+
+      mutate({
+        ...data,
+        ...update_threads_by_pk,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   if (isFallback) return <Layout>Loading thread</Layout>;
   return (
     <div>
-      <h1>{data.threads_by_pk.title}</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold">
+        {data.threads_by_pk.title}
+      </h1>
+      <div className="flex p-1 items-center">
+        {data.threads_by_pk.locked && (
+          <span className="bg-red-300 text-red-800 px-2 py-1 rounded-full uppercase">
+            Locked
+          </span>
+        )}
+        <button className="flex apearance-none p-1" onClick={handleLocked}>
+          {data.threads_by_pk.locked ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="w-5 h-5 current-fill"
+            >
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M7 10h13a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h1V9a7 7 0 0 1 13.262-3.131l-1.789.894A5 5 0 0 0 7 9v1zm-2 2v8h14v-8H5zm5 3h4v2h-4v-2z" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="w-5 h-5 current-fill"
+            >
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M19 10h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h1V9a7 7 0 1 1 14 0v1zM5 12v8h14v-8H5zm6 2h2v4h-2v-4zm6-4V9A5 5 0 0 0 7 9v1h10z" />
+            </svg>
+          )}
+        </button>
+      </div>
       <div className="p-6 space-y-10">
         <PostList
           posts={data.threads_by_pk.posts}
