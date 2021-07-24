@@ -64,7 +64,9 @@ export default function CategoryPage({ initialData }) {
 
   return (
     <div>
-      <h1>{data.categories_by_pk.name}</h1>
+      <h1 className="text-3xl font-bold text-red-500">
+        {data.categories_by_pk.name}
+      </h1>
       <div className="p-6 space-y-10">
         <ThreadList threads={data.categories_by_pk.threads} />
       </div>

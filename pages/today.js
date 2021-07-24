@@ -53,7 +53,7 @@ const TodaysPostPage = ({ initialData }) => {
   );
   return (
     <div>
-      <p className="text-red-500">Welcome to Forum!</p>
+      <p className="text-3xl font-bold text-red-500">Welcome to Forum!</p>
       <ThreadList threads={data.threads} />
     </div>
   );

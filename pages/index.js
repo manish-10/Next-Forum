@@ -51,7 +51,7 @@ const IndexPage = ({ initialData }) => {
   );
   return (
     <div>
-      <p className="text-red-500">Welcome to Forum!</p>
+      <p className="text-red-500 text-3xl font-bold">Welcome to Forum!</p>
       <ThreadList threads={data.threads} />
     </div>
   );
