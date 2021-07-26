@@ -22,11 +22,11 @@ export default function Layout({ children }) {
           {isAuthenticated ? (
             <>
               <Link href="/ask">
-                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-400 transform hover:-translate-y-1 hover:scale-110">
+                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-500 transform hover:-translate-y-1 hover:scale-110">
                   Ask a question
                 </a>
               </Link>
-              <p className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-400 transform hover:-translate-y-1 hover:scale-110">{`Hello ${user.name}`}</p>
+              <p className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-500 transform hover:-translate-y-1 hover:scale-110">{`Hello ${user.name}`}</p>
               <button
                 className="font-semibold text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-400 transform hover:-translate-y-1 hover:scale-110"
                 onClick={() => logout()}
@@ -37,12 +37,12 @@ export default function Layout({ children }) {
           ) : (
             <>
               <Link href="/auth/register">
-                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-110">
+                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-400 transform hover:-translate-y-1 hover:scale-110">
                   Register
                 </a>
               </Link>
               <Link href="/auth/login">
-                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-110">
+                <a className="text-white px-3 py-2 rounded-md transition duration-500 ease-in-out bg-indigo-500 hover:bg-green-400 transform hover:-translate-y-1 hover:scale-110">
                   Login
                 </a>
               </Link>
